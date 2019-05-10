@@ -23,7 +23,6 @@
 FILE *out_file;
 int throttle = 0;
 
-//const size_t buffsize = 4096;
 char condition[BUFF_SIZE];
 char terrain[BUFF_SIZE];
 char state[BUFF_SIZE];
@@ -33,17 +32,21 @@ int fd;
 
 
 
-pthread_t thread1, thread2, thread3;
-int rc1, rc2, rc3;
+pthread_t thread1, thread2, thread3, thread4;
+int rc1, rc2, rc3, rc4;
 
 sem_t logSemaphore;
 sem_t serverSemaphore;
 
+void *getState(void *arg);
+void *getTerrain(void *arg);
+void *getCondition(void *arg);
+
 void sendCommand(char msg[BUFF_SIZE]);
 void logCommand(char msg[BUFF_SIZE]);
-void getState();
-void getTerrain();
-void getCondition();
+//void getState();
+//void getTerrain();
+//void getCondition();
 
 void *logData(void *arg){
   sem_wait(&logSemaphore);
@@ -51,15 +54,22 @@ void *logData(void *arg){
   out_file = fopen("DataLog","a+");
     
   fprintf(out_file, "%s\n", msg);
-  
-  getState();
+
+  rc4 = pthread_create( &thread4, NULL, getState, NULL);
+  //getState();
+  assert(rc4 == 0);
+  pthread_join(thread4, NULL);
+ 
   fprintf(out_file, "%s\n", state);
-  //printf("STATE--------%s\n", state);
+
   fprintf(out_file, "%s\n", condition);
-  //printf("CONDITION--------%s\n", condition);
-  getTerrain();
+
+  rc4 = pthread_create( &thread4, NULL, getTerrain, NULL);
+  //getTerrain();
+  assert(rc4 == 0);
+  pthread_join(thread4, NULL);
   fprintf(out_file, "%s\n", terrain);
-  //printf("TERRAIN--------%s\n", terrain);
+
 
 
   fclose(out_file);
@@ -135,36 +145,15 @@ void *getInput(void *arg){
 }
 void *updateDash(void *arg){ 
   while(1){
-	getCondition();
+	
+	rc4 = pthread_create( &thread4, NULL, getCondition, NULL);
+  	//getCondition();
+  	assert(rc4 == 0);
+  	pthread_join(thread4, NULL);
         sendto(fd, condition, strlen(condition), 0, address2->ai_addr, address2->ai_addrlen);
        	usleep (100000);
   }
 }
-
-/*void *logData(void *arg, char message[buffersize]){ 
-  FILE *out_file = fopen("DataLog", "w");
-  if (out_file == NULL) 
-  {   
-	printf("Error! Could not open file\n");  
-  }
-
-  while(1){
-	char msg[BUFF_SIZE];
-    	char incoming[BUFF_SIZE];
-	size_t msgsize;
-	
-	strcpy(msg, "state:?");
-	sendto(fd, msg, strlen(msg), 0, address->ai_addr, address->ai_addrlen);
-	
-	msgsize = recvfrom(fd, incoming, BUFF_SIZE, 0, NULL, 0);
-    	incoming[msgsize] = '\0';
-        
-	fprintf(out_file, "%s\n", incoming);
-
-       	usleep (100000);
-  }
-  fclose(out_file);
-}*/
 
 
 int main ( int argc, char *argv[] )
@@ -225,12 +214,12 @@ int main ( int argc, char *argv[] )
     sem_destroy(&logSemaphore);
 }
 
-void getState(){
+void *getState(void *arg){
 	char msg[BUFF_SIZE];
     	char incoming[BUFF_SIZE];
 	size_t msgsize;
 	
-	sem_wait(&serverSemaphore);	
+	sem_wait(&serverSemaphore);
 	
 	strcpy(msg, "state:?");
 	sendto(fd, msg, strlen(msg), 0, address->ai_addr, address->ai_addrlen);
@@ -242,12 +231,12 @@ void getState(){
  	s = strstr(incoming, "state:="); 
 
 	if(s != NULL){
-		printf("STATE ---- %s", incoming);
 		strcpy(state, incoming);
 	}
 	sem_post(&serverSemaphore);
+	return 0;
 }
-void getTerrain(){
+void *getTerrain(void *arg){
 	char msg[BUFF_SIZE];
     	char incoming[BUFF_SIZE];
 	size_t msgsize;
@@ -257,12 +246,16 @@ void getTerrain(){
 	
 	msgsize = recvfrom(fd, incoming, BUFF_SIZE, 0, NULL, 0);
     	incoming[msgsize] = '\0';
-	if(strcmp(incoming, "terrain:=")){
+
+	char *s;
+ 	s = strstr(incoming, "terrain:="); 
+
+	if(s != NULL){
 		strcpy(terrain, incoming);
 	}
 	sem_post(&serverSemaphore);
 }
-void getCondition(){
+void *getCondition(void *arg){
 	char msg[BUFF_SIZE];
     	char incoming[BUFF_SIZE];
 	size_t msgsize;
@@ -272,8 +265,11 @@ void getCondition(){
 	
 	msgsize = recvfrom(fd, incoming, BUFF_SIZE, 0, NULL, 0);
     	incoming[msgsize] = '\0';
-	if(strcmp(incoming, "condition:=")){
-		
+
+	char *s;
+ 	s = strstr(incoming, "condition:="); 
+
+	if(s != NULL){
 		strcpy(condition, incoming);
 	}
 	sem_post(&serverSemaphore);
