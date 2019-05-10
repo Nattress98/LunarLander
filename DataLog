@@ -1,0 +1,250 @@
+throttle up
+command:=
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+state:=
+x:390.17993958384574
+y:579.0
+O:0.0
+x':0.0
+y':0.0
+O':0.0
+
+throttle up
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+command:=
+
+throttle up
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+throttle up
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+throttle up
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+throttle up
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+throttle up
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+terrain:=
+points: 11
+data-x: 365, 370, 375, 380, 385, 390, 395, 400, 405, 410, 405
+data-y: 578, 577, 578, 580, 581, 579, 576, 571, 567, 564, 567
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+throttle up
+terrain:=
+points: 11
+data-x: 365, 370, 375, 380, 385, 390, 395, 400, 405, 410, 405
+data-y: 578, 577, 578, 580, 581, 579, 576, 571, 567, 564, 567
+
+state:=
+x:390.17993958384574
+y:579.0
+O:0.0
+x':0.0
+y':0.0
+O':0.0
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+throttle up
+command:=
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+state:=
+x:390.17993958384574
+y:579.0
+O:0.0
+x':0.0
+y':0.0
+O':0.0
+
+throttle up
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+command:=
+
+throttle up
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+throttle up
+state:=
+x:390.17993958384574
+y:579.0
+O:0.0
+x':0.0
+y':0.0
+O':0.0
+
+command:=
+
+terrain:=
+points: 11
+data-x: 365, 370, 375, 380, 385, 390, 395, 400, 405, 410, 405
+data-y: 578, 577, 578, 580, 581, 579, 576, 571, 567, 564, 567
+
+throttle up
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+command:=
+
+throttle up
+terrain:=
+points: 11
+data-x: 365, 370, 375, 380, 385, 390, 395, 400, 405, 410, 405
+data-y: 578, 577, 578, 580, 581, 579, 576, 571, 567, 564, 567
+
+state:=
+x:390.17993958384574
+y:579.0
+O:0.0
+x':0.0
+y':0.0
+O':0.0
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+throttle up
+state:=
+x:390.17993958384574
+y:579.0
+O:0.0
+x':0.0
+y':0.0
+O':0.0
+
+command:=
+
+terrain:=
+points: 11
+data-x: 365, 370, 375, 380, 385, 390, 395, 400, 405, 410, 405
+data-y: 578, 577, 578, 580, 581, 579, 576, 571, 567, 564, 567
+
+throttle up
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+condition:=
+fuel:0.0%
+altitude:-0.002025000000003274
+contact:crashed
+
+command:=
+
