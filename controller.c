@@ -30,7 +30,7 @@ struct addrinfo *address;
 struct addrinfo *address2;
 int fd;
 
-
+bool isActive = true;
 
 pthread_t thread1, thread2, thread3, thread4;
 int rc1, rc2, rc3, rc4;
@@ -38,48 +38,49 @@ int rc1, rc2, rc3, rc4;
 sem_t logSemaphore;
 sem_t serverSemaphore;
 
-void *getState(void *arg);
+void *sendCommand(void *arg);
+void *getState(void *arg);		
 void *getTerrain(void *arg);
 void *getCondition(void *arg);
 
-void sendCommand(char msg[BUFF_SIZE]);
+//void sendCommand(char msg[BUFF_SIZE]);
 void logCommand(char msg[BUFF_SIZE]);
 //void getState();
 //void getTerrain();
 //void getCondition();
 
 void *logData(void *arg){
-  sem_wait(&logSemaphore);
   char *msg = (char*)arg;
-  out_file = fopen("DataLog","a+");
+  out_file = fopen("DataLog.txt","a+");
     
   fprintf(out_file, "%s\n", msg);
 
-  rc4 = pthread_create( &thread4, NULL, getState, NULL);
-  //getState();
-  assert(rc4 == 0);
-  pthread_join(thread4, NULL);
- 
+  sem_wait(&serverSemaphore);
+	  rc4 = pthread_create( &thread4, NULL, getState, NULL);
+	  assert(rc4 == 0);
+	  pthread_join(thread4, NULL);
+  sem_post(&serverSemaphore);
+
   fprintf(out_file, "%s\n", state);
 
   fprintf(out_file, "%s\n", condition);
 
-  rc4 = pthread_create( &thread4, NULL, getTerrain, NULL);
-  //getTerrain();
-  assert(rc4 == 0);
-  pthread_join(thread4, NULL);
+  sem_wait(&serverSemaphore);
+	  rc4 = pthread_create( &thread4, NULL, getTerrain, NULL);
+	  assert(rc4 == 0);
+	  pthread_join(thread4, NULL);
+  sem_post(&serverSemaphore);
+
   fprintf(out_file, "%s\n", terrain);
 
-
-
   fclose(out_file);
-  sem_post(&logSemaphore);
+
   return 0;
 }
 
 void *getInput(void *arg){
     char input;
-    while (1){
+    while (isActive){
         char outgoing[BUFF_SIZE];
         scanf("%s", &input);
 	
@@ -88,71 +89,106 @@ void *getInput(void *arg){
 		if(throttle <= 90)
 		   	throttle += 10;
 		sprintf(outgoing, "command:!\nmain-engine:%d", throttle);
-		sendCommand(outgoing);
-		logCommand("throttle up");
+		sem_wait(&serverSemaphore);
+			rc4 = pthread_create( &thread4, NULL, sendCommand, (void *) &outgoing);
+	  		assert(rc4 == 0);
+	  		pthread_join(thread4, NULL);
+ 		sem_post(&serverSemaphore);
+		logCommand("throttle up \n");
 		printf("throttle: %d \n", throttle);
 		break;
 	   case 's':
 		if(throttle >= 10)
 			throttle -= 10;
 		sprintf(outgoing, "command:!\nmain-engine:%d", throttle);
-		sendCommand(outgoing);
-		logCommand("throttle down");
+		sem_wait(&serverSemaphore);
+			rc4 = pthread_create( &thread4, NULL, sendCommand, (void *) &outgoing);
+	  		assert(rc4 == 0);
+	  		pthread_join(thread4, NULL);
+ 		sem_post(&serverSemaphore);
+		logCommand("throttle down \n");
 		printf("throttle: %d \n", throttle);
 		break;
 	   case 'q':
 		printf("spin left \n");
 		strcpy(outgoing, "command:!\nrcs-roll:-0.5");
-                sendCommand(outgoing);
-		logCommand("spin left"); 
+		sem_wait(&serverSemaphore);
+			rc4 = pthread_create( &thread4, NULL, sendCommand, (void *) &outgoing);
+	  		assert(rc4 == 0);
+	  		pthread_join(thread4, NULL);
+ 		sem_post(&serverSemaphore);
+		logCommand("spin left \n"); 
 		break;
 	   case 'w':
 		printf("stop turning \n");
 		strcpy(outgoing, "command:!\nrcs-roll:0");
-                sendCommand(outgoing);
-		logCommand("stop spinning");
+		sem_wait(&serverSemaphore);
+			rc4 = pthread_create( &thread4, NULL, sendCommand, (void *) &outgoing);
+	  		assert(rc4 == 0);
+	  		pthread_join(thread4, NULL);
+ 		sem_post(&serverSemaphore);
+		logCommand("stop spinning \n");
 		break;
 	   case 'e':
 		printf("turn right \n");
 		strcpy(outgoing, "command:!\nrcs-roll:0.5");
-                sendCommand(outgoing);
-		logCommand("spin right");
+		sem_wait(&serverSemaphore);
+			rc4 = pthread_create( &thread4, NULL, sendCommand, (void *) &outgoing);
+	  		assert(rc4 == 0);
+	  		pthread_join(thread4, NULL);
+ 		sem_post(&serverSemaphore);
+		logCommand("spin right \n");
 		break;
 	   case 'r':
-		strcpy(outgoing, "state:?");
-		sendCommand(outgoing);
+		sem_wait(&serverSemaphore);
+		
+		rc4 = pthread_create( &thread4, NULL, getState, NULL);
+  		assert(rc4 == 0);
+  		pthread_join(thread4, NULL);
+
+ 		sem_post(&serverSemaphore);
+		printf("%s", state);
 		break;
 	   case 'd':
-		strcpy(outgoing, "terrain:?");
-		sendCommand(outgoing);
+		sem_wait(&serverSemaphore);
+		rc4 = pthread_create( &thread4, NULL, getTerrain, NULL);
+  		assert(rc4 == 0);
+  		pthread_join(thread4, NULL);
+
+ 		sem_post(&serverSemaphore);
+
+		printf("%s", terrain);
 		break;
+	   case 'l':
+		isActive = false;
+		printf("exiting...\n");
+		break;	
 	   case 'h':
 		printf("a: throttle up\n");
 		printf("s: throttle down\n");
 		printf("q: spin left\n");
 		printf("w: stop spinning\n");
 		printf("e: spin right\n");
+		printf("r: get the current state of the lander \n");
+		printf("d: get terrain details beneath the lander \n");
 	   default:
 		printf("invalid input, enter h for controls. \n");
 		break;
   	}
-	//msgsize = recvfrom(fd, incoming, buffsize, 0, NULL, 0); /* Don't need the senders address */
-    	//incoming[msgsize] = '\0';
-	//if(!strcmp(incoming, "command:="))
-		//printf("reply is: %s \n", incoming);
     }
     pthread_exit(NULL);
 }
 void *updateDash(void *arg){ 
-  while(1){
-	
+  while(isActive){
+	sem_wait(&serverSemaphore);
 	rc4 = pthread_create( &thread4, NULL, getCondition, NULL);
-  	//getCondition();
   	assert(rc4 == 0);
   	pthread_join(thread4, NULL);
+	sem_post(&serverSemaphore);
         sendto(fd, condition, strlen(condition), 0, address2->ai_addr, address2->ai_addrlen);
        	usleep (100000);
   }
+  return 0;
 }
 
 
@@ -162,7 +198,7 @@ int main ( int argc, char *argv[] )
     char *port = "65200";
     char *port2 = "65250";
 
-    out_file = fopen("DataLog", "w");
+    out_file = fopen("DataLog.txt", "w");
 
     if (out_file == NULL) 
     {   
@@ -198,10 +234,6 @@ int main ( int argc, char *argv[] )
         exit(1);
     }
     
-    //struct sockaddr clientaddr;
-    //socklen_t addrlen = sizeof(clientaddr);
-
-    
     rc1 = pthread_create( &thread1, NULL, getInput, NULL);
     rc2 = pthread_create( &thread2, NULL, updateDash, NULL);
        
@@ -210,6 +242,7 @@ int main ( int argc, char *argv[] )
     pthread_join(thread1, NULL);
     assert(rc2 == 0);
     pthread_join(thread2, NULL);
+
     sem_destroy(&serverSemaphore);
     sem_destroy(&logSemaphore);
 }
@@ -219,7 +252,7 @@ void *getState(void *arg){
     	char incoming[BUFF_SIZE];
 	size_t msgsize;
 	
-	sem_wait(&serverSemaphore);
+
 	
 	strcpy(msg, "state:?");
 	sendto(fd, msg, strlen(msg), 0, address->ai_addr, address->ai_addrlen);
@@ -233,14 +266,14 @@ void *getState(void *arg){
 	if(s != NULL){
 		strcpy(state, incoming);
 	}
-	sem_post(&serverSemaphore);
+
 	return 0;
 }
 void *getTerrain(void *arg){
 	char msg[BUFF_SIZE];
     	char incoming[BUFF_SIZE];
 	size_t msgsize;
-	sem_wait(&serverSemaphore);
+
 	strcpy(msg, "terrain:?");
 	sendto(fd, msg, strlen(msg), 0, address->ai_addr, address->ai_addrlen);
 	
@@ -253,13 +286,13 @@ void *getTerrain(void *arg){
 	if(s != NULL){
 		strcpy(terrain, incoming);
 	}
-	sem_post(&serverSemaphore);
+	return 0;
 }
 void *getCondition(void *arg){
 	char msg[BUFF_SIZE];
     	char incoming[BUFF_SIZE];
 	size_t msgsize;
-	sem_wait(&serverSemaphore);
+
 	strcpy(msg, "condition:?");
 	sendto(fd, msg, strlen(msg), 0, address->ai_addr, address->ai_addrlen);
 	
@@ -272,24 +305,29 @@ void *getCondition(void *arg){
 	if(s != NULL){
 		strcpy(condition, incoming);
 	}
-	sem_post(&serverSemaphore);
+	return 0;
+
 }
 void logCommand(char msg[BUFF_SIZE])
 {
+  sem_wait(&logSemaphore);
   	rc3 = pthread_create( &thread3, NULL, logData, msg);
         assert(rc3 == 0);
     	pthread_join(thread3, NULL); 
+  sem_post(&logSemaphore);
 }
 
-void sendCommand(char msg[BUFF_SIZE])
+void *sendCommand(void *arg)
 {
+	char *msg;
+	msg = (char*) arg;
     	char incoming[BUFF_SIZE];
 	size_t msgsize;
-	sem_wait(&serverSemaphore);
+
 	sendto(fd, msg, strlen(msg), 0, address->ai_addr, address->ai_addrlen);
 	msgsize = recvfrom(fd, incoming, BUFF_SIZE, 0, NULL, 0);
     	incoming[msgsize] = '\0';
-	sem_post(&serverSemaphore);
+	return 0;
 }
 
 
