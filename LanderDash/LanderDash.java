@@ -56,6 +56,7 @@ public class LanderDash extends JFrame implements Runnable {
 			connection.addressname.setEditable(false);
 			connection.port.setEditable(false);
             while(fuel>=0) {
+
                 /* set up socket for reception */
                 if(socket!=null) {
                     /* start with fresh datagram packet */
@@ -66,8 +67,8 @@ public class LanderDash extends JFrame implements Runnable {
                        lines and key:value pairs
                     */
                     String message = new String(packet.getData());
-		    message = message.replace('%', ' ');		    
-			
+
+
                     String[] lines = message.trim().split("\n");
                     for(String l : lines) {
                         String[] pair = l.split(":");
@@ -81,7 +82,6 @@ public class LanderDash extends JFrame implements Runnable {
                         }
                     }
                 }
-
                 try {
                     Thread.sleep(100);
                 }
