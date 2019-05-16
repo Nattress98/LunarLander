@@ -23,6 +23,11 @@
 FILE *out_file;
 int throttle = 0;
 
+//controls last log if landed or crashed (not flying)
+bool crashed = false;
+bool printCrashed = false;
+bool printLanded = false;
+
 char condition[BUFF_SIZE];
 char terrain[BUFF_SIZE];
 char state[BUFF_SIZE];
@@ -194,6 +199,17 @@ void *updateDash(void *arg){
 			cond[i] = ' ';
 	}
         sendto(fd, cond, strlen(cond), 0, address2->ai_addr, address2->ai_addrlen);
+	//PRINTS LAST MESSAGE IF CRASHED OR LANDED.
+	if(printCrashed && crashed)
+	{
+		printCrashed = false;
+		logCommand("--CRASHED--");
+	}
+	if(printLanded && crashed)
+	{
+		printLanded = false;
+		logCommand("--LANDED--");
+	}
        	usleep (100000);
   }
   return 0;
@@ -319,11 +335,30 @@ void *getCondition(void *arg){
 
 	if(s != NULL){
 		strcpy(condition, incoming);
+		s = strstr(incoming, "crashed"); 
+		if(s != NULL)
+		{
+			if(!crashed){
+				printCrashed = true;
+			}
+			crashed = true;
+		   	return 0;
+		}
+		s = strstr(incoming, "down"); 
+		if(s != NULL)
+		{
+			if(!crashed){
+				printLanded = true;
+			}
+			crashed = true;
+		   	return 0;
+		}
+		crashed = false;
 	}
 	return 0;
 
 }
-//initiallises the data log thread
+//initialises the data log thread
 void logCommand(char msg[BUFF_SIZE])
 {
   sem_wait(&logSemaphore);
